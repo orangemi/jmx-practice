@@ -2,7 +2,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = "com.example.mbeans.Main"
+mainClassName = "com.example.Main"
 applicationDefaultJvmArgs = ['-Dcom.sun.management.jmxremote.port=9999',
                              '-Dcom.sun.management.jmxremote.authenticate=false',
                              '-Dcom.sun.management.jmxremote.ssl=false']

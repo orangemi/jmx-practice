@@ -24,28 +24,6 @@ import javax.management.remote.JMXServiceURL;
 
 public class Client {
   
-  /**
-   * Inner class that will handle the notifications.
-   */
-  public static class ClientListener implements NotificationListener {
-    public void handleNotification(Notification notification,
-                                   Object handback) {
-      echo("\nReceived notification:");
-      echo("\tClassName: " + notification.getClass().getName());
-      echo("\tSource: " + notification.getSource());
-      echo("\tType: " + notification.getType());
-      echo("\tMessage: " + notification.getMessage());
-      if (notification instanceof AttributeChangeNotification) {
-        AttributeChangeNotification acn =
-          (AttributeChangeNotification) notification;
-        echo("\tAttributeName: " + acn.getAttributeName());
-        echo("\tAttributeType: " + acn.getAttributeType());
-        echo("\tNewValue: " + acn.getNewValue());
-        echo("\tOldValue: " + acn.getOldValue());
-      }
-    }
-  }
-  
   /* For simplicity, we declare "throws Exception".
      Real programs will usually want finer-grained exception handling. */
   public static void main(String[] args) throws Exception {
@@ -57,10 +35,6 @@ public class Client {
     JMXServiceURL url =
       new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:9999/jmxrmi");
     JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
-    
-    // Create listener
-    //
-    ClientListener listener = new ClientListener();
     
     // Get an MBeanServerConnection
     //
@@ -115,7 +89,24 @@ public class Client {
     // Add notification listener on Hello MBean
     //
     echo("\nAdd notification listener...");
-    mbsc.addNotificationListener(mbeanName, listener, null, null);
+    mbsc.addNotificationListener(mbeanName, new NotificationListener() {
+      @Override
+      public void handleNotification(Notification notification, Object handback) {
+        echo("\nReceived notification:");
+        echo("\tClassName: " + notification.getClass().getName());
+        echo("\tSource: " + notification.getSource());
+        echo("\tType: " + notification.getType());
+        echo("\tMessage: " + notification.getMessage());
+        if (notification instanceof AttributeChangeNotification) {
+          AttributeChangeNotification acn =
+            (AttributeChangeNotification) notification;
+          echo("\tAttributeName: " + acn.getAttributeName());
+          echo("\tAttributeType: " + acn.getAttributeType());
+          echo("\tNewValue: " + acn.getNewValue());
+          echo("\tOldValue: " + acn.getOldValue());
+        }
+      }
+    }, null, null);
     
     // Get CacheSize attribute in Hello MBean
     //
